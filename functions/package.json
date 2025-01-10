@@ -18,6 +18,7 @@
     "@langchain/core": "^0.3.27",
     "@langchain/openai": "^0.3.16",
     "axios": "^1.7.9",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "firebase-admin": "^12.6.0",
     "firebase-functions": "^6.0.1",
@@ -27,6 +28,7 @@
     "pdf2json": "^3.1.5"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/pdf-parse": "^1.1.4",
     "firebase-functions-test": "^3.1.0",
     "typescript": "^5.0.0"

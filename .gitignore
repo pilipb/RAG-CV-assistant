@@ -64,3 +64,5 @@ package-lock.json
 /lib/
 dist
 .turbo
+functions/ui-debug.log
+functions/firebase-debug.log
