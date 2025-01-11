@@ -1,4 +1,24 @@
 {
-  "indexes": [],
-  "fieldOverrides": []
+  "indexes": [
+    {
+      "collectionGroup": "pdfs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "embedding",
+          "arrayConfig": "CONTAINS"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "pdfs",
+      "fieldPath": "embedding",
+      "vectorConfig": {
+        "dimension": 2048,
+        "flat": {}
+      }
+    }
+  ]
 }

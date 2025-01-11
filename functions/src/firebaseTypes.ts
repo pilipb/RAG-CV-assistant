@@ -9,15 +9,12 @@ export interface FirestorePdf {
     title: string | null;
     createdAt: admin.firestore.Timestamp | null;
     content: string | null;
-    embedding: FieldValue | null;
+    embedding: FieldValue | Array<number> | null;
     metadata: Json | null;
     notes: Json | null;
 }
 
 export interface FirestoreChat {
-    id: string;
-    createdAt: admin.firestore.Timestamp | null;
-    pdfIds: string[] | null;
     question: string | null;
     answer: string | null;
     followUpQus: string[] | null;
@@ -27,5 +24,4 @@ export interface FirestoreChat {
 export type Json = {
     [key: string]: any;
 }
-
 

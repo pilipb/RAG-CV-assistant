@@ -48,7 +48,7 @@ export const NOTE_PROMPT = ChatPromptTemplate.fromMessages([
 
         Respond with a JSON array with one key: "note". 
         "note" should be a string with the note content. 
-        Take a deep breath, and work your way through the paper step by step.`,
+        Take a deep breath, and work your way through the CV step by step.`,
     ],
     ['human', 'Paper: {paper}']
 ])

@@ -6,8 +6,7 @@ import { formatDocumentsAsString } from "langchain/util/document";
 import { ChatOpenAI } from "@langchain/openai";
 import { NOTE_PROMPT, NOTES_TOOL_SCHEMA, outputParser, PaperNote } from "./prompts";
 import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
-import { FirestorePdf } from "./firebaseTypes";
+import { FirestorePdf } from "../firebaseTypes";
 import { OpenAI } from "openai";
 
 
@@ -120,47 +119,39 @@ export async function generateNotesFromPdf(cvUrl: string): Promise<Array<PaperNo
   return notes;
 }
 
-async function generateOpenAIEmbedding(
+export async function generateOpenAIEmbedding(
   text: string
-): Promise<FieldValue> {
+): Promise<Array<number>> {
   // Use OpenAI's embedding model to generate embeddings for the provided text
   const embeddingResponse = await openai.embeddings.create({
     model: "text-embedding-3-large",
     input: text,
+    dimensions: 2048,
   });
 
   // Check if embeddings are returned
   if (embeddingResponse.data && embeddingResponse.data[0].embedding) {
-    return FieldValue.arrayUnion(...embeddingResponse.data[0].embedding); // Return the embedding vector as FieldValue
+    return embeddingResponse.data[0].embedding;
   }
 
   throw new Error("Failed to generate embedding from OpenAI.");
 }
 
 
-async function storePdfToFirestore(pdfData: FirestorePdf): Promise<void> {
+async function storePdfToFirestore(pdfData: FirestorePdf): Promise<string> {
   // generate a reference to the PDF document in Firestore
   const pdfRef = admin.firestore().collection("users/demo/pdfs").doc();
-
-  // Prepare the PDF object to be stored
-  const pdfObject = {
-    url: pdfData.url,
-    title: pdfData.title,
-    createdAt: pdfData.createdAt || admin.firestore.Timestamp.now(),
-    content: pdfData.content,
-    embedding: pdfData.embedding || FieldValue.arrayUnion([]), // Ensure embedding is initialized
-    metadata: pdfData.metadata,
-    notes: pdfData.notes,
-  };
+  console.log({ pdfRef });
 
   // Set the document in Firestore
-  await pdfRef.set(pdfObject, { merge: true });
+  await pdfRef.set(pdfData, { merge: true });
 
   console.log("PDF stored successfully in Firestore.");
+  return pdfRef.id;
 }
 
 
-async function main({ cvUrl, name }: { cvUrl: string; name: string }) {
+export async function addNewPdf(cvUrl: string ): Promise<FirestorePdf> {
   if (!cvUrl.endsWith("pdf")) {
     throw new Error("The url must point to a pdf file");
   }
@@ -170,7 +161,7 @@ async function main({ cvUrl, name }: { cvUrl: string; name: string }) {
 
   // console.log({ documents });
   console.log({ 'documents length': documents.length });
-  const notes = await generateNotes(documents);
+  const notes = await (await generateNotes(documents)).map((note) => note.note);
 
   // console.log({ notes });
   console.log({ 'notes length': notes.length });
@@ -181,24 +172,29 @@ async function main({ cvUrl, name }: { cvUrl: string; name: string }) {
   const embedding = await generateOpenAIEmbedding(content);
 
   // console.log({  embedding });
-  console.log({ 'embedding': embedding });
-
+  console.log({ 'embedding length': embedding.length });
+try {
   const pdfData: FirestorePdf = {
     url: cvUrl,
     title: "test", // You can extract the title from the PDF or other metadata
-    createdAt: admin.firestore.Timestamp.now(),
+    createdAt: null,
     content: content,
     embedding: embedding,
     metadata: {}, 
     notes: notes,
   };
 
-  // console.log({ pdfData });
+  console.log({ pdfData });
 
-  await storePdfToFirestore( pdfData);
+  const refId = await storePdfToFirestore( pdfData);
+  console.log("PDF stored successfully in Firestore with refId: ", refId);
 
-
+  return pdfData;
+} catch (error) {
+  throw new Error(`Failed to add PDF: ${error}`);
 }
+}
+
 
 // main({
 //   cvUrl: "https://www.sbs.ox.ac.uk/sites/default/files/2019-01/cv-template.pdf",
