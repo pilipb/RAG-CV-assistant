@@ -29,7 +29,7 @@ app.post('/take-notes', async (req: any, res: any) => {
 app.post('/add-pdf', async (req: any, res: any) => {
     const { cvUrl } = req.body;
     try {
-      console.log("add-pdf");
+      console.log("add-pdf: ", cvUrl);
       const pdfData = await addNewPdf(cvUrl);
         res.status(200).send(pdfData);
       return;
