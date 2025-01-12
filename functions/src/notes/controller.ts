@@ -8,14 +8,22 @@ import { NOTE_PROMPT, NOTES_TOOL_SCHEMA, outputParser, PaperNote } from "./promp
 import * as admin from "firebase-admin";
 import { FirestorePdf } from "../firebaseTypes";
 import { OpenAI } from "openai";
-
+import * as functions from "firebase-functions";
+import { onInit } from "firebase-functions/v2/core";
 
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Ensure this environment variable is set
-});
+// Access the OpenAI API key from Firebase functions config
+const openaiApiKey = functions.config().openai.key;
+
+let openai: OpenAI;
+onInit(() => {
+  openai = new OpenAI({
+    apiKey: openaiApiKey, 
+  });
+}
+);
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({

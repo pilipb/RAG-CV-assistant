@@ -10,7 +10,7 @@ export default async function handler(
     res: NextApiResponse<PaperNote>
     ) {
     const API_URL =
-      "http://127.0.0.1:5001/rag-cv-assistant/us-central1/api/qa";
+      "https://us-central1-rag-cv-assistant.cloudfunctions.net/api/qa";
     const data = await fetch(API_URL, {
         method: "POST",
         body: JSON.stringify(req.body),

@@ -44,12 +44,12 @@ export default async function handler(
     fs.renameSync(filePath, newFilePath);
 
     // Generate a URL (you could use a static file serving route here)
-    const fileUrl = `http://localhost:3000/uploads/${uploadedFile.originalFilename}`;
+    const fileUrl = `https://rag-cv-assistant.web.app/uploads/${uploadedFile.originalFilename}`;
 
     console.log("File uploaded successfully:", fileUrl);
 
     const API_URL =
-      "http://127.0.0.1:5001/rag-cv-assistant/us-central1/api/add-pdf";
+      "https://us-central1-rag-cv-assistant.cloudfunctions.net/api/add-pdf";
       
     const data = await fetch(API_URL, {
       method: "POST",

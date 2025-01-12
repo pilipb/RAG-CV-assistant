@@ -1,6 +1,6 @@
 import {  addNewPdf, generateNotesFromPdf } from './notes/controller';
 import { qaOnCV } from './qa/controller';
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v1";
 import * as bodyParser from "body-parser";
 import express from 'express';
 import cors from "cors";
@@ -46,5 +46,5 @@ app.post('/qa', async (req: any, res: any) => {
 });
 
 // Export the Express app as a Firebase Function
-exports.api = functions.https.onRequest(app);
+exports.api = functions.https.onRequest(app );
 
