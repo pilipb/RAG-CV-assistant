@@ -43,7 +43,13 @@ export const ChatInterface = () => {
   useEffect(() => {
     const fetchChatThreads = async () => {
       try {
-        const response = await fetch("/api/get_chat_threads");
+        const response = await fetch("/api/get_chat_threads", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+        );
         const data = await response.json();
         setChatThreads(data.threads || []);
 

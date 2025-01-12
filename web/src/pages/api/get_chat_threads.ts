@@ -3,11 +3,10 @@ import * as admin from "firebase-admin";
 import { FirestoreChat } from "../../../../functions/src/firebaseTypes";
 
 // Initialize Firebase Admin SDK if not already initialized
-if (!admin.apps.length) {
-  admin.initializeApp({
+
+admin.initializeApp({
     credential: admin.credential.applicationDefault(),
   });
-}
 
 const db = admin.firestore();
 
