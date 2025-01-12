@@ -38,10 +38,10 @@ export const QA_ON_CV_PROMPT = ChatPromptTemplate.fromMessages([
         Here are some notes on the CV:
         {notes}
 
-        And here are some relevant parts of the CV and additional PDFs relating to the questions:
+        And here are some relevant parts of the CV relating to the questions:
         {relevantDocuments}
         
-        Answer the recruiter's question in the context of the CV and additional PDFs. You should also suggest follow-up questions that the recruiter might ask based on your answer.
+        Answer the recruiter's question in the context of the CV, giving as much specific detail as possible. You should also suggest follow-up questions that the recruiter might ask based on your answer.
         Take a deep breath, and think through your reply carefully, step by step.`,
   ],
   ["human", "Question: {question}"],

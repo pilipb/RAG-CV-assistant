@@ -2,18 +2,21 @@ import { useState } from "react";
 import { PdfUpload, uploadFile } from "../components/pdfUpload";
 import { ChatInterface } from "../components/chat";
 import { ReferencesDisplay } from "../components/references";
+import { FirestorePdf} from "../../../functions/src/firebaseTypes";
 
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [references, setReferences] = useState<string[]>([]);
     const [notes, setNotes] = useState<string[]>([]);
+    let pdfData: FirestorePdf | null = null;
   
   
-    const handlePdfUpload = (file: File) => {
-      uploadFile(file);
+    const handlePdfUpload = async (file: File) => {
+      pdfData = await uploadFile(file);
       setPdfFile(file);
-      console.log("Uploaded PDF:", file);
+      console.log("Notes:", pdfData?.notes);
+      console.log("Uploaded PDF:", pdfData);
     };
   
     return (
@@ -22,7 +25,7 @@ export default function Home() {
         <div className="flex w-full space-x-4 flex-row md:flex-row h-full">
           {/* PDF Upload Section */}
           <div className="w-1/5 md:w-1/5 h-[60vh] p-4">
-            <PdfUpload onFileUpload={handlePdfUpload} />
+            <PdfUpload onFileUpload={handlePdfUpload} pdfFile={pdfFile} />
           </div>
 
           {/* Chat Interface */}
@@ -32,7 +35,7 @@ export default function Home() {
 
           {/* References Section */}
           <div className="w-1/5 md:w-1/5 h-[60vh] p-4">
-            <ReferencesDisplay references={references} />
+            <ReferencesDisplay fileName={""} />
           </div>
         </div>
       </div>

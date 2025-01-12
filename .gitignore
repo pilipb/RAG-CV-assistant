@@ -66,3 +66,7 @@ dist
 .turbo
 functions/ui-debug.log
 functions/firebase-debug.log
+.firebase
+functions/ui-debug.log
+firebase-debug.log
+.DS_Store

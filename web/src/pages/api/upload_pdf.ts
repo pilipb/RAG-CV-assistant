@@ -66,6 +66,7 @@ export default async function handler(
       return null;
     });
     if (data) {
+      // data will be type FirestorePdf
       res.status(200).json(data);
     }
     return res

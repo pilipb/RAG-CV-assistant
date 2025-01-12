@@ -15,23 +15,85 @@ export const ChatInterface = () => {
     []
   );
   const { register, handleSubmit, reset } = useForm<ChatFormData>();
+  const [chatThreads, setChatThreads] = useState<
+    { question: string; answer: string }[]
+  >([]);
+
+  const [followUpQus, setFollowUpQus] = useState<string[]>([]);
+
+  // Handle click on a follow-up question
+  const handleFollowUpClick = (question: string) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text: question, sender: "user" },
+    ]);
+    reset();
+
+    // Ask the follow-up question
+    fetch("/api/qa", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question }),
+    });
+  };
+
+  // Fetch chat threads from Firestore
+  useEffect(() => {
+    const fetchChatThreads = async () => {
+      try {
+        const response = await fetch("/api/get_chat_threads");
+        const data = await response.json();
+        setChatThreads(data.threads || []);
+
+        // set the messages to the chat threads
+        setMessages(
+          data.threads.flatMap((thread: { question: any; answer: any; }) => [
+            { text: thread.question, sender: "user" },
+            { text: thread.answer, sender: "assistant" },
+          ])
+        );
+
+        // set the follow up questions
+        setFollowUpQus(data.threads.map((thread: { followUpQus: any; }) => thread.followUpQus).flat());
+      } catch (error) {
+        console.error("Error fetching chat threads:", error);
+      }
+    };
+
+    fetchChatThreads();
+  }, []);
 
   // Reference for the last message to scroll to
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
-
 
   const onSubmit = async (data: { message: string }) => {
     // Add the user's message and reset the form
     setMessages([...messages, { text: data.message, sender: "user" }]);
     reset();
 
+    // Ask the follow-up question
+    fetch("/api/qa", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: data.message }),
+    });
+
+    // refresh the chat threads
+    reset();
+
+
+
     // Simulate the assistant's response
-    setTimeout(() => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: "This is a response from the assistant.", sender: "assistant" },
-      ]);
-    }, 1000);
+    // setTimeout(() => {
+    //   setMessages((prevMessages) => [
+    //     ...prevMessages,
+    //     { text: "This is a response from the assistant.", sender: "assistant" },
+    //   ]);
+    // }, 1000);
   };
 
   // Scroll to the last message whenever messages change
@@ -55,7 +117,7 @@ export const ChatInterface = () => {
             ref={index === messages.length - 1 ? lastMessageRef : null} // Only set the ref for the last message
             className={`p-3 rounded-lg   ${
               msg.sender === "user"
-                ? "bg-gray-200 text-black self-end" 
+                ? "bg-gray-200 text-black self-end"
                 : "bg-gray-400 text-black self-start"
             } max-w-[80%]`}
           >
@@ -64,6 +126,19 @@ export const ChatInterface = () => {
         ))}
       </div>
 
+      {/* Follow-up Questions Buttons */}
+      <div className="flex p-2 space-x-2">
+        {followUpQus.length > 0 &&
+          followUpQus.slice(-3).map((question, index) => (
+            <Button
+              key={index}
+              className="bg-gray-500 text-white opacity-50 p-4 rounded-lg min-w-[140px] min-h-[60px] hover:opacity-100 whitespace-normal"
+              onClick={() => handleFollowUpClick(question)}
+            >
+              {question}
+            </Button>
+          ))}
+      </div>
       {/* Message Input */}
       <CardFooter className="w-full flex items-center space-y-2 text-white">
         <form

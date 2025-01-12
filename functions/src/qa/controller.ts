@@ -1,18 +1,17 @@
 import {
   VectorQuery,
   VectorQuerySnapshot,
-  VectorValue,
 } from "@google-cloud/firestore";
 
 import { firestore } from "firebase-admin";
 import { generateOpenAIEmbedding } from "../notes/controller";
-import { FieldValue } from "firebase-admin/firestore";
 import { FirestorePdf  } from "../firebaseTypes";
 import { Document } from "langchain/document";
 import { PaperNote } from "../notes/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import { outputParser, QA_ON_CV_PROMPT, QA_TOOL_SCHEMA } from "./prompts";
 import { formatDocumentsAsString } from "langchain/util/document";
+
 
 async function searchByVector(
   coll: firestore.CollectionReference,
@@ -91,7 +90,7 @@ async function saveQaToFirestore(
     question: string,
     answer: string,
     followUpQus: string[],
-    context: string
+    context: string,
 ) {
   const chatRef = firestore().collection("users/demo/chats").doc();
 
@@ -100,6 +99,7 @@ async function saveQaToFirestore(
     answer: answer,
     followUpQus: followUpQus,
     context: context,
+    timestamp: null, // Todo!!: make this work with timestamp (having issues with firestore timestamp)
   };
 
   // Set the document in Firestore
@@ -117,12 +117,11 @@ export async function qaOnCV(question: string) {
 
   const answerAndQuestions = await qaModel(question, documents, notes as Array<PaperNote>);
 
-
-
   await saveQaToFirestore(
     question, 
     answerAndQuestions[0].answer, 
     answerAndQuestions[0].followupQuestions, 
-    formatDocumentsAsString(documents)
+    formatDocumentsAsString(documents),
+  
     );
 }

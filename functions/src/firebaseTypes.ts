@@ -19,6 +19,7 @@ export interface FirestoreChat {
     answer: string | null;
     followUpQus: string[] | null;
     context: string | null;
+    timestamp: admin.firestore.Timestamp | null;
 }
 
 export type Json = {
