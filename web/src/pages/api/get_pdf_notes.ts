@@ -2,11 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as admin from "firebase-admin";
 
 // Initialize Firebase Admin SDK if not already initialized
-
-if (admin.apps) {
-admin.initializeApp({
+if (!admin.apps.length) {
+  admin.initializeApp({
     credential: admin.credential.applicationDefault(),
-    storageBucket: "rag-cv-assistant.firebasestorage.app", // Your Firebase Storage bucket
   });
 }
 
